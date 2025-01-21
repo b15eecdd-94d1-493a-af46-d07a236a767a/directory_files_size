@@ -32,22 +32,18 @@ class DirectorySizeCalculator:
 
     def size_files_in_directory(self, directory, max_depth = 10, current_depth = 0):
         dir_size = 0
-        self.directory_sizes[directory] = 0
-        try:
-            os.access(directory, os.R_OK)
-        except Exception as error:
-            self.errors.append(traceback.format_exc())
+        self.directory_sizes[directory] = (0, current_depth)
         for entry in self.scandir(directory):
                 if entry.is_file():
                     dir_size += os.path.getsize(entry)
                 elif entry.is_dir() and current_depth < max_depth:
                     subdir_size = self.size_files_in_directory(entry.path, max_depth, current_depth + 1)
                     self.directory_sizes[entry.path] = subdir_size
-                    dir_size += subdir_size
+                    dir_size += subdir_size[0]
                 elif entry.is_dir() and current_depth >= max_depth:
-                    dir_size += self._size_files_in_directory(entry)   
-        self.directory_sizes[directory] = dir_size
-        return dir_size
+                    dir_size += self._size_files_in_directory(entry) 
+        self.directory_sizes[directory] = (dir_size, current_depth)
+        return (dir_size, current_depth)
     
     def _size_files_in_directory(self, directory):
         dir_size = 0
@@ -71,10 +67,19 @@ if __name__ == "__main__":
     directory_path = input('Путь к каталогу: ').strip()  # Укажите путь к вашему каталогу
     max_depth = input('Максимальная вложенность: ')
     size_canculator.size_files_in_directory(directory_path, int(max_depth))
-    
-    for dir_path, dir_size in size_canculator.directory_sizes.items():
-        dir_size = human_readable_size(dir_size)
-        print(f"{dir_path} {dir_size}") 
+    i = 0
+    for dir_info in size_canculator.directory_sizes.items():
+        dir_path = os.path.basename(dir_info[0])
+        dir_size = human_readable_size(dir_info[1][0])
+        if i == 0:
+            print('')
+        if dir_info[1][1] == 1 and i != 0:
+            print('')
+        prefix = '-' * dir_info[1][1]
+        if prefix != '':
+            prefix += ' '
+        print(f"{prefix}{dir_path} {dir_size}") 
+        i += 1
     if len(size_canculator.get_errors()) > 0:
-        print('Обнаружены ошибки, посмотрите файл exceptions.log')
+        print('\nОбнаружены ошибки, посмотрите файл exceptions.log')
     #size_canculator.print_errors()
