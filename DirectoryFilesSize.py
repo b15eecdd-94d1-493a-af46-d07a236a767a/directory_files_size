@@ -39,7 +39,7 @@ class DirectorySizeCalculator:
         if directory not in self.directory_sizes_detail:
             self.directory_sizes_detail[directory] = {}
         if 'type' not in self.directory_sizes_detail[directory]:
-            self.directory_sizes_detail[directory]['type'] = {'video': 0, 'audio': 0, 'doc': 0, 'sub': 0, 'image': 0, 'archive': 0, 'over': 0} 
+            self.directory_sizes_detail[directory]['type'] = {'video': 0, 'audio': 0, 'doc': 0, 'sub': 0, 'image': 0, 'archive': 0, 'undefined': 0} 
         if 'ext' not in self.directory_sizes_detail[directory]:
             self.directory_sizes_detail[directory]['ext'] = {}
         if file_suffix not in self.directory_sizes_detail[directory]['ext']:
@@ -49,16 +49,16 @@ class DirectorySizeCalculator:
             self.directory_sizes_detail[directory]['type']['video'] += filesize
         elif file_suffix in ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp']:
             self.directory_sizes_detail[directory]['type']['image'] += filesize
-        elif file_suffix in ['.txt', '.odt', '.ods', '.odp', '.php', '.cpp', '.py', '.pl', '.html', '.js', '.css', '.pdf', '.go' , '.mhtml', '.xml', '.json', '.docx']:
+        elif file_suffix in ['.txt', '.odt', '.ods', '.odp', '.php', '.cpp', '.py', '.pl', '.html', '.js', '.css', '.pdf', '.go' , '.mhtml', '.xml', '.json', '.docx', '.djvu', '.djv']:
             self.directory_sizes_detail[directory]['type']['doc'] += filesize
         elif file_suffix in ['.mp3', '.flac', '.m4a']:
             self.directory_sizes_detail[directory]['type']['audio'] += filesize
         elif file_suffix in ['.srt', '.ass', '.vtt']:
             self.directory_sizes_detail[directory]['type']['sub'] += filesize
-        elif file_suffix in ['.zip', '.rar', '.gzip', '.gz', '.tar']:
+        elif file_suffix in ['.zip', '.rar', '.gzip', '.gz', '.tar', '.7z']:
             self.directory_sizes_detail[directory]['type']['archive'] += filesize
         else:
-            self.directory_sizes_detail[directory]['type']['over'] += filesize
+            self.directory_sizes_detail[directory]['type']['undefined'] += filesize
 
     def size_files_in_directory(self, directory, max_depth = 10, current_depth = 0):
         dir_size = 0
