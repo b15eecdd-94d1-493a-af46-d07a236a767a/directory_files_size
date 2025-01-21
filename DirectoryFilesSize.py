@@ -21,8 +21,12 @@ class DirectorySizeCalculator:
         try:
             return os.scandir(directory)
         except Exception as error:
+            if len(self.errors) == 0:
+                file_mode = 'w'
+            else:
+                file_mode = 'a'
             self.errors.append(traceback.format_exc())  
-            with open("exceptions.log", "w") as logfile:
+            with open("exceptions.log", file_mode) as logfile:
                 traceback.print_exc(file=logfile)
             return []
 
